@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-class Tensor
+class Tensor1d
 {
 private:
     int rows;
@@ -17,41 +17,42 @@ private:
 public:
     float *data;
     // Constructor
-    Tensor(int rows, int cols);
+    Tensor1d(int rows, int cols);
 
     // Destructor
-    ~Tensor();
+    ~Tensor1d();
 
     // Copy constructor
-    Tensor(const Tensor &other);
+    Tensor1d(const Tensor1d &other);
 
     // Assignment operator
-    Tensor &operator=(const Tensor &other);
+    Tensor1d &operator=(const Tensor1d &other);
 
     // Getters
     int getRows() const;
     int getCols() const;
 
-    // Function to set tensor values
+    // Function to set Tensor1d values
     void setValues(float *hostData);
 
-    // Function to print tensor values
+    // Function to print Tensor1d values
     void print() const;
 
-    // Function to copy tensor data from GPU to CPU
+    // Function to copy Tensor1d data from GPU to CPU
     void toCPU(float *hostData) const;
 
     // Overloaded operators for element-wise operations
 
     float &operator()(int i, int j) const;
 
-    void Tensor::Mul(Tensor *b, Tensor *c);
-    // __device__ Tensor operator+(const Tensor &other) const;
+    void Tensor1d::Mul(Tensor1d *b, Tensor1d *c);
+    void Tensor1d::Sum(Tensor1d *b, Tensor1d *c);
+    Tensor1d operator+(Tensor1d &other);
 
-    // __device__ Tensor operator-(const Tensor &other) const;
+    // __device__ Tensor1d operator-(const Tensor1d &other) const;
 
     // // Matrix multiplication
-    Tensor operator*(Tensor &other);
+    Tensor1d operator*(Tensor1d &other);
 };
 
 #endif /*TENSOR_CUR*/

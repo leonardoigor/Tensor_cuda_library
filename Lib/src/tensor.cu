@@ -1,27 +1,27 @@
-#include "include/tensor.cuh"
-#include "tensor.cuh"
-// #include "tensor.cuh"
-// #include "tensor.cuh"
-// #include "tensor.cuh"
+#include "include/Tensor.cuh"
+#include "Tensor.cuh"
+// #include "Tensor1d.cuh"
+// #include "Tensor1d.cuh"
+// #include "Tensor1d.cuh"
 
-Tensor::Tensor(int rows, int cols) : rows(rows), cols(cols)
+Tensor1d::Tensor1d(int rows, int cols) : rows(rows), cols(cols)
 {
     cudaMalloc(&data, rows * cols * sizeof(float));
 }
 
-Tensor::~Tensor()
+Tensor1d::~Tensor1d()
 {
 
     cudaFree(data);
 }
 // Copy constructor
-Tensor::Tensor(const Tensor &other) : rows(other.rows), cols(other.cols)
+Tensor1d::Tensor1d(const Tensor1d &other) : rows(other.rows), cols(other.cols)
 {
     cudaMalloc(&data, rows * cols * sizeof(float));
     cudaMemcpy(data, other.data, rows * cols * sizeof(float), cudaMemcpyDeviceToDevice);
 }
 
-__host__ Tensor &Tensor::operator=(const Tensor &other)
+__host__ Tensor1d &Tensor1d::operator=(const Tensor1d &other)
 {
     if (this != &other)
     {
@@ -33,21 +33,21 @@ __host__ Tensor &Tensor::operator=(const Tensor &other)
     }
     return *this;
 }
-__host__ int Tensor::getRows() const
+__host__ int Tensor1d::getRows() const
 {
     return rows;
 }
-__host__ int Tensor::getCols() const
+__host__ int Tensor1d::getCols() const
 {
     return cols;
 }
 
-__host__ void Tensor::setValues(float *hostData)
+__host__ void Tensor1d::setValues(float *hostData)
 {
     cudaMemcpy(data, hostData, rows * cols * sizeof(float), cudaMemcpyHostToDevice);
 }
 
-__host__ void Tensor::print() const
+__host__ void Tensor1d::print() const
 {
     float *hostData = new float[rows * cols];
     cudaMemcpy(hostData, data, rows * cols * sizeof(float), cudaMemcpyDeviceToHost);
@@ -64,12 +64,12 @@ __host__ void Tensor::print() const
     delete[] hostData;
 }
 
-__host__ void Tensor::toCPU(float *hostData) const
+__host__ void Tensor1d::toCPU(float *hostData) const
 {
     cudaMemcpy(hostData, data, rows * cols * sizeof(float), cudaMemcpyDeviceToHost);
 }
 
-__device__ float &Tensor::operator()(int i, int j) const
+__device__ float &Tensor1d::operator()(int i, int j) const
 {
     return data[i * cols + j];
 }
@@ -90,10 +90,26 @@ __global__ void MULGLOAL(float *a, float *b, float *c, int cols, int rows)
     }
     // printf("\n----%d,%d---\n", cols, rows);
 }
-
-__host__ void Tensor::Mul(Tensor *b, Tensor *c)
+__global__ void SUMGLOAL(float *a, float *b, float *c, int cols, int rows)
 {
-    printf("Test\n");
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            int tid = blockIdx.x * blockDim.x + threadIdx.x;
+            if (tid < rows * cols)
+            {
+                // printf("d %f\n", c[tid]);
+                c[tid] = a[tid] + b[tid];
+                // printf("a %f\n", c[tid]);
+            }
+        }
+    }
+}
+
+__host__ void Tensor1d::Mul(Tensor1d *b, Tensor1d *c)
+{
+    // printf("Test\n");
     auto cols = this->cols;
     auto rows = this->rows;
     int blockSize = 256;
@@ -102,33 +118,41 @@ __host__ void Tensor::Mul(Tensor *b, Tensor *c)
 
     MULGLOAL<<<numBlocks, blockSize>>>(this->data, b->data, c->data, cols, rows);
     cudaDeviceSynchronize();
-    // c->print();
-    // cudaError_t cudaError = cudaGetLastError();
-    // if (cudaError != cudaSuccess)
-    // {
-    //     std::cerr << "CUDA error: " << cudaGetErrorString(cudaError) << std::endl;
-    // }
-    // else
-    // {
-    //     std::cout << "No CUDA error detected." << std::endl;
-    // }
 }
-// __device__ Tensor Tensor::operator+(const Tensor &other) const
-// {
-//     Tensor result(rows, cols);
-//     for (int i = 0; i < rows; ++i)
-//     {
-//         for (int j = 0; j < cols; ++j)
-//         {
-//             result(i, j) = (*this)(i, j) + other(i, j);
-//         }
-//     }
-//     return result;
-// }
+__host__ void Tensor1d::Sum(Tensor1d *b, Tensor1d *c)
+{
+    // printf("Test\n");
+    auto cols = this->cols;
+    auto rows = this->rows;
+    int blockSize = 256;
+    int numBlocks = (rows * cols + blockSize - 1) / blockSize;
+    // c->print();
 
-// __device__ Tensor Tensor::operator-(const Tensor &other) const
+    SUMGLOAL<<<numBlocks, blockSize>>>(this->data, b->data, c->data, cols, rows);
+    cudaDeviceSynchronize();
+}
+// c->print();
+// cudaError_t cudaError = cudaGetLastError();
+// if (cudaError != cudaSuccess)
 // {
-//     Tensor result(*this);
+//     std::cerr << "CUDA error: " << cudaGetErrorString(cudaError) << std::endl;
+// }
+// else
+// {
+//     std::cout << "No CUDA error detected." << std::endl;
+// }
+Tensor1d Tensor1d::operator+(Tensor1d &other)
+{
+    Tensor1d result(rows, cols);
+    Tensor1d *b = &other;
+    Tensor1d *result2 = &result;
+    Sum(b, result2);
+    return result;
+}
+
+// __device__ Tensor1d Tensor1d::operator-(const Tensor1d &other) const
+// {
+//     Tensor1d result(*this);
 //     for (int i = 0; i < rows; ++i)
 //     {
 //         for (int j = 0; j < cols; ++j)
@@ -139,11 +163,11 @@ __host__ void Tensor::Mul(Tensor *b, Tensor *c)
 //     return result;
 // }
 
-Tensor Tensor::operator*(Tensor &other)
+Tensor1d Tensor1d::operator*(Tensor1d &other)
 {
-    Tensor result(rows, other.cols);
-    Tensor *b = &other;
-    Tensor *result2 = &result;
+    Tensor1d result(rows, other.cols);
+    Tensor1d *b = &other;
+    Tensor1d *result2 = &result;
     Mul(b, result2);
     return result;
 }
