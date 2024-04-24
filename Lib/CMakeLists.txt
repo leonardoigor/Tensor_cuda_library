@@ -53,3 +53,7 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
     ${PROJECT_NAME}_CUDA
 )
+
+cuda_add_executable(${PROJECT_NAME}_TEST
+    main.cpp)
+target_link_libraries(${PROJECT_NAME}_TEST ${PROJECT_SOURCE_DIR}/build/Debug/Tensor.lib ${PROJECT_SOURCE_DIR}/build/Debug/Tensor_CUDA.lib)
