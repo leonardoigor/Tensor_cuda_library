@@ -1,7 +1,8 @@
-#include "tensor.cuh"
+#include "tensor1d.cuh"
 #include "iostream"
+#include "tensor2d.cuh"
 
-int main(int argc, char const *argv[])
+void Test1d()
 {
     int size1, size2;
     size1 = 50;
@@ -38,6 +39,20 @@ int main(int argc, char const *argv[])
     delete a;
     delete b;
     delete c;
+}
+void Test2d()
+{
+    int size1, size2;
+    size1 = 50;
+    size2 = 50;
+    Tensor2d *a = new Tensor2d(10, 12);
+    auto b = Tensor2d::Random(-1, 1, 10, 10);
+    // Tensor2d *b = new Tensor2d();
+}
+int main(int argc, char const *argv[])
+{
+    // Test1d();
+    Test2d();
     std::cout << "Heelo" << std::endl;
     return 0;
 }

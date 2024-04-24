@@ -1,6 +1,6 @@
 #include "iostream"
 #include "LibTest.h"
-#include "tensor.cuh"
+#include "tensor1d.cuh"
 int main(int argc, char const *argv[])
 {
     LibTest *lt = new LibTest();
