@@ -7,8 +7,8 @@ int main(int argc, char const *argv[])
     int size1, size2;
     size1 = 20000;
     size2 = 20000;
-    Tensor *a = new Tensor(size1, size2);
-    Tensor *b = new Tensor(size1, size2);
+    Tensor1d *a = new Tensor1d(size1, size2);
+    Tensor1d *b = new Tensor1d(size1, size2);
     float *hostData = static_cast<float *>(malloc(sizeof(float) * size1 * size2));
     for (size_t i = 0; i < size1 * size2; i++)
     {
@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
 
     a->setValues(hostData);
     b->setValues(hostData);
-    Tensor *c = new Tensor(size1, size2);
+    Tensor1d *c = new Tensor1d(size1, size2);
     a->Mul(*b, *c);
     free(hostData);
     // a->print();

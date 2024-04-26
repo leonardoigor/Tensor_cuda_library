@@ -8,14 +8,15 @@ __global__ void RandomInRangeKernel(int min, int max, int cols, int rows, float 
 {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
-
     if (row < rows && col < cols)
     {
         curandState state;
         curand_init(0, row * cols + col, 0, &state); // Initialize curand state
 
-        // Generate a random value within the specified range
+        // // Generate a random value within the specified range
+        printf("[(%d,%d) (%d,%d)] ", row, rows, col, cols);
         float random_value = min + (max - min) * curand_uniform(&state);
-        results[row][col] = random_value;
+        // results[row][col] = random_value;
+        printf(" r= (%f,%f)", random_value, results[col][row]);
     }
 }

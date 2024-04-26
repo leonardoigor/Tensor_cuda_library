@@ -4,7 +4,7 @@
 class Tensor2d
 {
 private:
-    float **data;
+    double *data;
 
     int cols;
     int rows;
@@ -13,6 +13,7 @@ public:
     Tensor2d(int cols, int rows);
     ~Tensor2d();
     static Tensor2d Random(int min, int max, int cols, int rows);
+    void Print();
 };
 
 #endif /*TENSOR2d_CUR*/
