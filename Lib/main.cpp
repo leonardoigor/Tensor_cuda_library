@@ -45,11 +45,13 @@ void Test2d()
     int size1, size2;
     size1 = 50;
     size2 = 50;
-    Tensor2d *a = new Tensor2d(10, 12);
-    // for (size_t i = 0; i < 1000; i++)
 
-    auto b = Tensor2d::Random(-1, 1, 1000, 1000);
-    b.Print();
+    auto b = Tensor2d::Random(-1, 1, 2, 2);
+    b->print();
+    b->setValue(2);
+    b->print();
+    b->mul(5);
+    b->print();
 
     // Tensor2d *b = new Tensor2d();
 }
